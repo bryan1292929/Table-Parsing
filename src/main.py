@@ -3,7 +3,6 @@ from model.model import *
 from model.baseline import *
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main_dir = 'C:/Users/bryan314/PycharmProjects/TableParsing'
     # folder = main_dir + '/data/raw/202003_train'
