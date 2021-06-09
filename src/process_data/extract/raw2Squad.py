@@ -44,24 +44,27 @@ def paragraph_from_table(text_matrix, hdr_idx, id_count, h_dict):
     windows = candidate_windows(clean_matrix(text_matrix), hdr_idx, h_dict)
     random.shuffle(windows)
     for window in windows:
-        question, text, candidates, h_count = window
-        if h_count >= 0:
-            # Concatenate the text for each candidate.
-            context = ""
-            for candidate in candidates:
-                context += candidate + " "
-            context = context[:-1]
-            # Q&A.
-            qas = {
-                'answers': [{'answer_start': context.index(text), 'text': text}],
-                'is_impossible': False,
-                'question': question,
-                'id': 'id:' + str(id_count),
-                'h_count': h_count
-            }
-            id_count += 1
-            dict_window = {'context': context, 'qas': [qas]}
-            paragraph += [dict_window]
+        question, text, candidates, h_count, has_answer = window
+        # Concatenate the text for each candidate.
+        context = ""
+        for candidate in candidates:
+            context += candidate + " "
+        context = context[:-1]
+        # Q&A.
+        if has_answer:
+            answer_list = [{'answer_start': context.index(text), 'text': text}]
+        else:
+            answer_list = []
+        qas = {
+            'answers': answer_list,
+            'is_impossible': not has_answer,
+            'question': question,
+            'id': 'id:' + str(id_count),
+            'h_count': h_count
+        }
+        id_count += 1
+        dict_window = {'context': context, 'qas': [qas]}
+        paragraph += [dict_window]
     return paragraph, id_count
 
 
@@ -69,8 +72,8 @@ def paragraph_from_table(text_matrix, hdr_idx, id_count, h_dict):
 def candidate_windows(text_matrix, hdr_idx, h_dict):
     # 2D list of candidate windows for each data cell.
     windows = []
-    # For each body cell in the table,
-    for i in range(hdr_idx + 1, len(text_matrix)):
+    # For each cell in the table,
+    for i in range(len(text_matrix)):
         for j in range(len(text_matrix[0])):
             vertical, horizontal = [], []
             # Append prior cells in the same column.
@@ -88,12 +91,15 @@ def candidate_windows(text_matrix, hdr_idx, h_dict):
             cell = whole(text_matrix[i][j][:10])
             # Current header (answer).
             header = whole(text_matrix[hdr_idx][j][:10])
-            if header in horizontal + vertical:
-                # Append the completed window to the list of windows.
-                if random.choice([True, False]):
-                    windows += [[cell, header, horizontal + vertical, h_count]]
-                else:
-                    windows += [[cell, header, vertical + horizontal, h_count]]
+            has_answer = header in horizontal + vertical
+            if len(horizontal + vertical):
+                answer_in_dict = text_matrix[hdr_idx][j] in h_dict.keys()
+                if has_answer and answer_in_dict and random.randint(1, 8) == 1:
+                    # Append the completed window to the list of windows.
+                    if random.choice([True, False]):
+                        windows += [[cell, header, horizontal + vertical, h_count, has_answer]]
+                    else:
+                        windows += [[cell, header, vertical + horizontal, h_count, has_answer]]
     return windows
 
 

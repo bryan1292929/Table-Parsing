@@ -8,6 +8,47 @@ from src.process_data.extract.unmerge_table import *
 from src.re_util.re_util import *
 
 
+# Returns the vertical-slice guess by the rowspan rule.
+def rowspan_guess(table):
+    row_list = [0]
+    if is_valid(table):
+        # Unmerge horizontally.
+        _, rowspan_horizontal = unmerge_horizontally(table)
+        rowspan_matrix = fill_rowspan(rowspan_horizontal)
+        for i in range(header_idx(table) + 1, len(rowspan_matrix)):
+            count = 1
+            line = rowspan_matrix[i]
+            for j in range(len(line) - 1):
+                if line[j] > line[j + 1]:
+                    count += 1
+                elif line[j] < line[j + 1]:
+                    return 0
+            row_list += [count]
+    return max(row_list)
+
+
+# Returns the vertical-slice guess by the colspan rule.
+def colspan_guess(table):
+    col_list = [0]
+    if header_idx(table) >= 0:
+        n_col = len(unmerge(table)[0])
+        row_list = list(table.iter('tr'))
+        i = 0
+        while i < len(row_list):
+            cell = list(row_list[i].iter(['th', 'td', 'te', 'tu']))[0]
+            rowspan, colspan = 1, 1
+            if 'rowspan' in cell.keys():
+                rowspan = max([1, int(cell.get('rowspan'))])
+            if 'colspan' in cell.keys():
+                colspan = max([1, int(cell.get('colspan'))])
+                if colspan != n_col:
+                    col_list += [colspan]
+            else:
+                col_list += [1]
+            i += rowspan
+    return max(col_list)
+
+
 # Returns the header index for a given table.
 def header_idx(table):
     hdr_idx = -1

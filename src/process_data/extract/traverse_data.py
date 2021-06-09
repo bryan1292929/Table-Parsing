@@ -22,5 +22,7 @@ def file_type(file):
     parser = etree.HTMLParser()
     tree = etree.parse(file, parser)
     root = tree.getroot()
-    name = list(root.iter('document-name'))[0]
-    return name.text
+    name = list(root.iter('document-name'))
+    if len(name):
+        return name[0].text
+    return ""

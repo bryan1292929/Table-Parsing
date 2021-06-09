@@ -47,11 +47,11 @@ def unify_dates(input_str):
                    '[0-9]{1,2}'  # Guranteed numeric month.
                    '('
                    '[월./-][0-9]{1,2}일?'  # Case 1: Month and day
-                   '|'  
+                   '|'
                    '월?'  # Case 2: Only month
-                   ')' 
-                   '(?![0-9%])'  # Condition for end of the date.
-                   , re.VERBOSE)
+                   ')'
+                   '(?![0-9%])',  # Condition for end of the date.
+                   re.VERBOSE)
     # Clean each type of date.
     input_str = p.sub(change_date, input_str)
 

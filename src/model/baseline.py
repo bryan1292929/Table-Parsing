@@ -10,13 +10,18 @@ def baseline_accuracy(dict_test, h_dict):
     for dict_par in dict_test['data']:
         # For each candidate window,
         for contexts in dict_par['paragraphs']:
-            answer = contexts['qas'][0]['answers'][0]['text']
+            if contexts['qas'][0]['is_impossible']:
+                answer = ""
+            else:
+                answer = contexts['qas'][0]['answers'][0]['text']
             context = contexts['context']
             candidates = [y for y in context.split()]
             random.shuffle(candidates)
             counts = []
+            h_count = 0
             for candidate in candidates:
                 if candidate in h_dict.keys():
+                    h_count += 1
                     counts += [h_dict[candidate]]
                 else:
                     counts += [0]

@@ -49,9 +49,11 @@ def get_answers(answer_file):
     answer_list = []
     for dict_par in dict_answer['data']:
         for context in dict_par['paragraphs']:
-            answer_list += [[context['qas'][0]['answers'][0]['text'],
-                             context['context'],
-                             context['qas'][0]['question']]]
+            if context['qas'][0]['is_impossible']:
+                answer = ""
+            else:
+                answer = context['qas'][0]['answers'][0]['text']
+            answer_list += [[answer, context['context'], context['qas'][0]['question']]]
     return answer_list
 
 

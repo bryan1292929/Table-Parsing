@@ -100,8 +100,8 @@ def fill_rowspan(rowspan_horizontal):
                 rowspan_horizontal[i + 1].insert(j, rowspan - 1)
         # Check if the next row is updated properly.
         in_range = i + 1 < len(rowspan_horizontal)
-        not_extended = len(rowspan_horizontal[i]) != len(rowspan_horizontal[i + 1])
-        if in_range and not_extended:
+        not_extended = in_range and len(rowspan_horizontal[i]) != len(rowspan_horizontal[i + 1])
+        if not_extended:
             return []
     return rowspan_horizontal
 
