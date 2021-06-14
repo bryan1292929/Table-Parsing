@@ -19,10 +19,13 @@ def rowspan_guess(table):
             count = 1
             line = rowspan_matrix[i]
             for j in range(len(line) - 1):
+                # If the rowspan decreases,
                 if line[j] > line[j + 1]:
                     count += 1
+                # Neglect cases where the rowspan increases.
                 elif line[j] < line[j + 1]:
                     return 0
+            # Length of max sequence (of decreasing rowspan) for the current row.
             row_list += [count]
     return max(row_list)
 
@@ -41,10 +44,10 @@ def colspan_guess(table):
                 rowspan = max([1, int(cell.get('rowspan'))])
             if 'colspan' in cell.keys():
                 colspan = max([1, int(cell.get('colspan'))])
-                if colspan != n_col:
-                    col_list += [colspan]
-            else:
-                col_list += [1]
+            # Neglect cases where the entire row is a single cell.
+            if colspan != n_col:
+                col_list += [colspan]
+            # Jump to the cell below (which is in the first column).
             i += rowspan
     return max(col_list)
 
@@ -117,7 +120,7 @@ def h_dict_for_file(file, index_type):
 
 
 # Given a table, returns a dictionary that maps from (header cell text) -> count.
-# index_type: True, cells in final row of header. Else, all cells in the header.
+# index_type: True, cells in final row of header. False, all cells in the header.
 def h_dict_for_table(table, index_type):
     h_dict_table = {}
     hdr_idx = header_idx(table)

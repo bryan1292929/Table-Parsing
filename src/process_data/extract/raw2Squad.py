@@ -1,5 +1,5 @@
 # File: raw2Squad.py
-# Creates SQUAD-formatted data from raw xml files.
+# Creates SQuAD-formatted data from raw xml files.
 from src.process_data.header_dictionary.header import *
 from src.re_util.re_util import *
 import json
